@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.7",
+  "bottlenecks": [
+    "未配置合适的缓冲池大小"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "70%",
+      "disk_iops": "8500",
+      "disk_latency": "1.2ms",
+      "network_throughput": "600MB/s"
+    },
+    "mysql": {
+      "query_per_second": "1200",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "innodb_buffer_pool_reads": "150/s",
+      "innodb_row_lock_time": "500ms",
+      "slow_queries": "5/s",
+      "threads_running": "25"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "1G",
+    "innodb_flush_method": "O_DIRECT",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "innodb_thread_concurrency": "16",
+    "max_connections": "200",
+    "query_cache_type": "0",
+    "innodb_flush_neighbors": "0"
+  },
+  "param_knowledge": "innodb_buffer_pool_size  \n- 控制 InnoDB 存储引擎用于缓存数据和索引的内存池大小；  \n- 推荐设置为物理内存的 50%~70%（需预留空间给操作系统及其他进程）；  \n- 是否动态生效：部分生效（修改后需重启完全生效，动态调整仅影响新增页）；  \n- 影响维度：内存、IO（减少磁盘读写）；  \n\ninnodb_buffer_pool_instances  \n- 控制 InnoDB 缓冲池的分区数量，降低多线程访问时的争用；  \n- 推荐设置为 4~8（若缓冲池≥8GB），每个实例≥1GB；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：CPU（并发访问优化）、内存（管理开销略增）；  \n\ninnodb_old_blocks_time  \n- 控制未被再次访问的页在缓冲池LRU列表中的保留时间（防全表扫描污染）；  \n- 推荐设置为 1000（毫秒，适用于频繁扫描场景）；  \n- 是否动态生效：是；  \n- 影响维度：内存（缓存命中率）、IO（减少无效缓存置换）；  \n\ninnodb_change_buffering  \n- 控制 InnoDB 对非唯一索引的写操作缓冲类型（inserts/deletes/purges等）；  \n- 推荐设置为 \"all\"（高写入场景）或 \"none\"（纯读取场景）；  \n- 是否动态生效：是；  \n- 影响维度：IO（减少随机写）、CPU（合并操作开销）；  \n\ninnodb_flush_neighbors  \n- 控制刷脏页时是否合并相邻页的IO操作（机械磁盘有效）；  \n- 推荐设置为 1（HDD开启）或 0（SSD关闭）；  \n- 是否动态生效：是；  \n- 影响维度：IO（吞吐量 vs 延迟）、磁盘寿命（SSD磨损均衡）；"
+}

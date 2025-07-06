@@ -1,0 +1,45 @@
+{
+  "app_name": "mysql",
+  "app_version": "8.0",
+  "bottlenecks": [
+    "未优化的JOIN操作导致性能下降"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "物理机"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "70%",
+      "disk_iops": "8500",
+      "network_throughput": "600MB/s",
+      "disk_latency": "0.8ms"
+    },
+    "mysql": {
+      "qps": "4500",
+      "tps": "1200",
+      "slow_queries": "15 per minute",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "select_join_performance": "200ms average latency",
+      "threads_running": "25",
+      "lock_wait_time": "150ms average"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "join_buffer_size": "256M",
+    "max_connections": "200",
+    "thread_cache_size": "32",
+    "innodb_flush_neighbors": "0",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8"
+  },
+  "param_knowledge": "join_buffer_size  \n- 控制 JOIN 操作时用于非索引连接的缓冲区大小；  \n- 推荐设置为 4M~8M（根据可用内存调整，通常不超过总内存的1%）；  \n- 是否动态生效：是；  \n- 影响维度：内存、IO（减少临时表写入）；  \n\nmax_join_size  \n- 限制单个JOIN查询可处理的最大行数，防止低效JOIN消耗过多资源；  \n- 推荐设置为 1M~10M（需权衡业务需求与系统负载）；  \n- 是否动态生效：是；  \n- 影响维度：CPU、内存（避免复杂JOIN导致系统过载）；  \n\noptimizer_switch  \n- 控制查询优化器的行为，包括JOIN优化策略（如BNL、BKA等）；  \n- 推荐启用 `batched_key_access=on` 和 `block_nested_loop=off`（针对现代硬件优化）；  \n- 是否动态生效：是；  \n- 影响维度：CPU、IO（优化执行计划减少扫描量）；  \n\nread_rnd_buffer_size  \n- 控制排序后读取行的缓冲区大小，影响JOIN后的排序性能；  \n- 推荐设置为 256K~1M（过大会增加内存开销）；  \n- 是否动态生效：是；  \n- 影响维度：内存、IO（减少随机读磁盘次数）；  \n\ntmp_table_size  \n- 控制内存临时表的最大值，超出后转为磁盘临时表（常见于JOIN和GROUP BY）；  \n- 推荐设置为 16M~64M（需监控临时表使用情况调整）；  \n- 是否动态生效：是；  \n- 影响维度：内存、IO（减少磁盘临时表生成）；"
+}

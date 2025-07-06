@@ -1,0 +1,46 @@
+{
+  "app_name": "mysql",
+  "app_version": "8.0",
+  "bottlenecks": [
+    "高并发连接数导致线程争用"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "75%",
+      "memory_utilization": "12GB/16GB (75%)",
+      "disk_iops": "15,000",
+      "disk_latency": "2ms",
+      "network_throughput": "800MB/s",
+      "context_switches_per_second": "5,000"
+    },
+    "mysql": {
+      "active_threads": "150/200 (75%)",
+      "queries_per_second": "3,500",
+      "connection_usage": "800/1,000 (80%)",
+      "thread_cache_hit_rate": "60%",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "slow_queries": "5 queries/sec",
+      "lock_wait_time": "500ms avg",
+      "transaction_rate": "1,200 transactions/sec"
+    }
+  },
+  "config": {
+    "max_connections": "400",
+    "thread_pool_size": "8",
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "2G",
+    "innodb_flush_log_at_trx_commit": "2",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "table_open_cache": "4000"
+  },
+  "param_knowledge": "innodb_thread_concurrency  \n- 控制 InnoDB 存储引擎并发执行的线程数上限，用于减少线程争用；  \n- 推荐设置为 CPU核心数的 2~3 倍（如16核机器设为32~48），或0表示无限制；  \n- 是否动态生效：是；  \n- 影响维度：CPU（线程调度）、内存（线程栈）；  \n\nthread_cache_size  \n- 控制线程缓存池中保留的线程数量，减少频繁创建/销毁线程的开销；  \n- 推荐设置为并发连接数的 5%~10%（如1000连接可设50~100）；  \n- 是否动态生效：是；  \n- 影响维度：CPU（线程创建）、内存（缓存线程资源）；  \n\ntable_open_cache  \n- 控制表描述符缓存数量，避免频繁开关表导致的元数据争用；  \n- 推荐设置为 max_connections * 表关联数（通常2000~4000）；  \n- 是否动态生效：是；  \n- 影响维度：内存（缓存占用）、IO（表文件访问）；  \n\ninnodb_read_io_threads  \n- 控制 InnoDB 后台读取操作的IO线程数，影响数据页加载效率；  \n- 推荐设置为4~8（SSD可设更高）；  \n- 是否动态生效：否；  \n- 影响维度：IO（磁盘读取）、CPU（IO线程处理）；  \n\nback_log  \n- 控制TCP连接等待队列长度，在高并发连接时缓解连接堆积；  \n- 推荐设置为 max_connections 的50%（Linux系统需同步调整somaxconn）；  \n- 是否动态生效：否；  \n- 影响维度：网络（连接处理）、内存（队列缓冲）；"
+}

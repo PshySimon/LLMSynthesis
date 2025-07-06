@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "8.0",
+  "bottlenecks": [
+    "未启用查询缓存或配置不当"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "70%",
+      "disk_iops": "8500",
+      "network_throughput": "1.2Gbps",
+      "disk_latency": "0.8ms"
+    },
+    "mysql": {
+      "qps": "1200",
+      "tps": "350",
+      "slow_queries": "15 per second",
+      "threads_connected": "45",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "query_cache_hit_rate": "0%",
+      "lock_timeouts": "5 per second"
+    }
+  },
+  "config": {
+    "query_cache_size": "0",
+    "innodb_buffer_pool_size": "8G",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "max_connections": "200",
+    "thread_cache_size": "16",
+    "innodb_flush_method": "O_DIRECT",
+    "innodb_flush_neighbors": "0"
+  },
+  "param_knowledge": "query_cache_size  \n- 控制 MySQL 查询缓存的内存分配大小，用于缓存 SELECT 语句及其结果集；  \n- 推荐设置为 64MB~256MB（根据可用内存调整，过高可能导致缓存失效开销增大）；  \n- 是否动态生效：是；  \n- 影响维度：内存（占用）、CPU（缓存管理开销）、IO（减少磁盘访问）；  \n\nquery_cache_type  \n- 控制查询缓存的工作模式（OFF/ON/DEMAND），决定是否缓存查询结果；  \n- 推荐设置为 ON（启用）或 DEMAND（仅缓存显式指定 SQL_CACHE 的查询）；  \n- 是否动态生效：是；  \n- 影响维度：内存（缓存占用）、CPU（缓存命中判断）、网络（减少重复查询传输）；  \n\nquery_cache_limit  \n- 限制单条查询结果集的最大缓存大小，避免大结果集占用过多缓存空间；  \n- 推荐设置为 1MB~4MB（根据典型查询结果大小调整）；  \n- 是否动态生效：是；  \n- 影响维度：内存（缓存利用率）、IO（避免缓存大结果集导致的频繁失效）；  \n\ntable_open_cache  \n- 控制表文件描述符的缓存数量，减少频繁开闭表的开销；  \n- 推荐设置为 2000~4000（需结合 max_connections 调整）；  \n- 是否动态生效：是；  \n- 影响维度：内存（缓存占用）、IO（减少表文件重复打开）；  \n\ninnodb_buffer_pool_size  \n- 定义 InnoDB 引擎缓冲池的大小，用于缓存表数据与索引（与查询缓存无关但影响整体性能）；  \n- 推荐设置为可用物理内存的 50%~70%；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：内存（主要占用）、IO（显著减少磁盘访问）；"
+}

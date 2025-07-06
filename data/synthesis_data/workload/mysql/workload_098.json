@@ -1,0 +1,45 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.7",
+  "bottlenecks": [
+    "统计信息不准确导致执行计划不佳"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "虚拟机（KVM）"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "70%",
+      "disk_iops": "8500",
+      "disk_latency": "2.5ms",
+      "network_throughput": "600MB/s"
+    },
+    "mysql": {
+      "qps": "4500",
+      "tps": "1200",
+      "slow_queries": "15",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "select_full_join": "8",
+      "innodb_row_lock_time_avg": "300ms"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "innodb_stats_persistent": "ON",
+    "innodb_stats_auto_recalc": "ON",
+    "innodb_stats_persistent_sample_pages": "32",
+    "query_cache_size": "0",
+    "max_connections": "200",
+    "tmp_table_size": "64M",
+    "max_heap_table_size": "64M"
+  },
+  "param_knowledge": "innodb_stats_persistent  \n- 控制 InnoDB 是否将统计信息持久化到磁盘；  \n- 推荐设置为 ON（启用），确保统计信息在重启后仍保持准确；  \n- 是否动态生效：是；  \n- 影响维度：查询计划准确性、存储IO（持久化操作）；  \n\ninnodb_stats_auto_recalc  \n- 控制 InnoDB 是否自动重新计算表的统计信息（当数据变化超过10%时）；  \n- 推荐设置为 ON（启用），以降低统计信息过时的概率；  \n- 是否动态生效：是；  \n- 影响维度：CPU（后台计算开销）、查询计划准确性；  \n\ninnodb_stats_persistent_sample_pages  \n- 控制持久化统计信息时的索引采样页数；  \n- 推荐设置为 20-200（数据量越大需越高），需权衡准确性与计算成本；  \n- 是否动态生效：是；  \n- 影响维度：CPU（采样计算）、存储IO（读取采样页）、统计信息精度；  \n\noptimizer_switch  \n- 控制查询优化器的行为开关组（如索引合并、范围优化等子选项）；  \n- 推荐根据业务场景调整，例如关闭 `index_merge_union` 减少复杂计划；  \n- 是否动态生效：是；  \n- 影响维度：查询计划生成效率、执行路径选择性；  \n\ninnodb_stats_transient_sample_pages  \n- 控制非持久化统计信息（内存临时统计）的索引采样页数；  \n- 推荐设置为 8-32（默认8），过高可能增加ANALYZE TABLE开销；  \n- 是否动态生效：是；  \n- 影响维度：内存占用、统计信息临时计算延迟；"
+}

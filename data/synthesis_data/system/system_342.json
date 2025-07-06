@@ -1,0 +1,8 @@
+{
+  "os_version": "openEuler 24.03 LTS",
+  "cpu_info": "4 核 @ 3.5GHz",
+  "memory_info": "16GB DDR4",
+  "storage_type": "本地 HDD RAID 10",
+  "network_info": "万兆以太网",
+  "runtime_environment": "物理机"
+}

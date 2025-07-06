@@ -1,0 +1,46 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.7",
+  "bottlenecks": [
+    "高并发连接数导致线程争用"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "虚拟机（KVM）"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "75%",
+      "memory_utilization": "12GB/16GB (75%)",
+      "disk_iops": "8500",
+      "disk_latency": "1.2ms",
+      "network_throughput": "3.2Gbps",
+      "context_switches_per_sec": "12000"
+    },
+    "mysql": {
+      "active_threads": "150/200 (75%)",
+      "queries_per_second": "4500",
+      "connection_usage": "380/400 (95%)",
+      "thread_cache_hit_rate": "65%",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "slow_queries_per_sec": "12",
+      "lock_wait_time_ms": "350ms"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "max_connections": "500",
+    "innodb_thread_concurrency": "16",
+    "thread_cache_size": "32",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "innodb_flush_log_at_trx_commit": "2",
+    "sync_binlog": "0",
+    "innodb_log_file_size": "1G"
+  },
+  "param_knowledge": "innodb_thread_concurrency  \n- 控制 InnoDB 存储引擎并发执行的线程数上限，用于减少线程争用；  \n- 推荐设置为 CPU核心数 * 2 或 0（禁用限制）；  \n- 是否动态生效：是；  \n- 影响维度：CPU、线程调度效率；  \n\nthread_cache_size  \n- 控制缓存空闲线程的数量，减少频繁创建/销毁线程的开销；  \n- 推荐设置为并发连接数的 5-10%（如 100-200）；  \n- 是否动态生效：是；  \n- 影响维度：内存、连接响应时间；  \n\nmax_connections  \n- 控制 MySQL 允许的最大客户端连接数；  \n- 推荐根据系统内存计算（如每连接内存消耗 * 总内存的 70%）；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：内存、线程争用、稳定性；  \n\ninnodb_read_io_threads  \n- 控制 InnoDB 后台读操作的 I/O 线程数；  \n- 推荐设置为 4-8（SSD可更高）；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：磁盘 I/O、查询吞吐量；  \n\ntable_open_cache  \n- 控制表描述符缓存数量，减少频繁开表开销；  \n- 推荐设置为 max_connections * 表关联数；  \n- 是否动态生效：是；  \n- 影响维度：内存、表操作延迟；"
+}

@@ -1,0 +1,45 @@
+{
+  "app_name": "mysql",
+  "app_version": "8.0",
+  "bottlenecks": [
+    "内存不足导致频繁磁盘I/O"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "75%",
+      "memory_utilization": "95%",
+      "swap_usage": "5GB",
+      "disk_iops": "15000",
+      "disk_latency": "5ms",
+      "network_throughput": "800Mbps"
+    },
+    "mysql": {
+      "query_throughput": "1200 queries/sec",
+      "slow_queries": "15 queries/sec",
+      "buffer_pool_hit_rate": "85%",
+      "innodb_buffer_pool_pages_free": "500",
+      "innodb_row_lock_waits": "20/sec",
+      "temporary_tables_created": "50/sec"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "2G",
+    "innodb_flush_method": "O_DIRECT",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "max_connections": "200",
+    "table_open_cache": "4000"
+  },
+  "param_knowledge": "innodb_buffer_pool_size  \n- 控制 InnoDB 存储引擎缓冲池的内存分配大小，用于缓存表数据、索引等热数据；  \n- 推荐设置为物理内存的 50%~70%（需预留内存供其他进程使用）；  \n- 是否动态生效：部分生效（修改后需重启实例完全生效，动态调整仅影响新增内存分配）；  \n- 影响维度：内存（减少磁盘I/O）、磁盘I/O（降低频繁读写）；  \n\ninnodb_io_capacity  \n- 控制 InnoDB 后台任务的 I/O 吞吐能力上限（如刷新脏页、合并插入缓冲等）；  \n- 推荐值为磁盘 IOPS 的 50%~80%（如 SSD 可设为 2000~4000）；  \n- 是否动态生效：是；  \n- 影响维度：磁盘I/O（平衡后台任务与用户请求的I/O争用）、吞吐量；  \n\ninnodb_flush_neighbors  \n- 控制 InnoDB 刷新脏页时是否合并相邻页的 I/O 操作（机械磁盘建议启用，SSD建议关闭）；  \n- 推荐值：机械磁盘设为1（启用），SSD设为0（关闭）；  \n- 是否动态生效：是；  \n- 影响维度：磁盘I/O（减少随机写次数）、延迟（SSD关闭后可降低写放大）；  \n\ninnodb_max_dirty_pages_pct  \n- 控制 InnoDB 缓冲池中脏页占比的阈值，超过该值会触发强制刷新；  \n- 推荐值：75%~90%（过高易引发I/O突增，过低增加刷新频率）；  \n- 是否动态生效：是；  \n- 影响维度：内存（脏页滞留量）、磁盘I/O（刷新频率）、吞吐量；  \n\ninnodb_adaptive_hash_index  \n- 控制 InnoDB 自适应哈希索引的开关，可加速等值查询但增加内存消耗；  \n- 推荐值：高频等值查询场景启用（ON），内存紧张时关闭（OFF）；  \n- 是否动态生效：是；  \n- 影响维度：内存（哈希索引占用）、CPU（减少B树遍历开销）、查询延迟；"
+}

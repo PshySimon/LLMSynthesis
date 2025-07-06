@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.7",
+  "bottlenecks": [
+    "未配置合适的缓冲池大小"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "虚拟机（KVM）"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "85%",
+      "disk_iops": "4500",
+      "disk_latency": "2.5ms",
+      "network_throughput": "800Mbps"
+    },
+    "mysql": {
+      "qps": "1200",
+      "tps": "150",
+      "buffer_pool_hit_rate": "75%",
+      "innodb_buffer_pool_size": "8GB",
+      "slow_queries": "5 per second",
+      "threads_connected": "50",
+      "threads_running": "12"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "1G",
+    "innodb_flush_method": "O_DIRECT",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "max_connections": "200"
+  },
+  "param_knowledge": "innodb_buffer_pool_size  \n- 控制 InnoDB 存储引擎用于缓存表和索引数据的内存池大小；  \n- 推荐设置为物理内存的 50%~80%（需预留内存供其他进程使用）；  \n- 是否动态生效：支持（需重启实例生效完全）；  \n- 影响维度：内存、IO（减少磁盘读写）；  \n\ninnodb_buffer_pool_instances  \n- 控制 InnoDB 缓冲池的分区数量，通过减少并发访问冲突提升吞吐量；  \n- 推荐设置为 4~8（当缓冲池大小 ≥8GB 时启用）；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：内存、CPU（多核并行处理能力）；  \n\ninnodb_old_blocks_time  \n- 控制新加载到缓冲池的页需等待多久才能进入\"年轻代\"队列，避免全表扫描污染缓存；  \n- 推荐设置为 1000（毫秒，适用于频繁扫描场景）；  \n- 是否动态生效：是；  \n- 影响维度：内存（缓存命中率）、IO；  \n\ninnodb_flush_neighbors  \n- 控制是否刷写相邻脏页（机械硬盘建议启用以优化 IO，SSD 建议关闭）；  \n- 推荐设置为 0（SSD）或 1（HDD）；  \n- 是否动态生效：是；  \n- 影响维度：IO（写入吞吐量）、存储设备类型；  \n\ninnodb_read_io_threads  \n- 控制 InnoDB 后台读操作的 I/O 线程数；  \n- 推荐设置为 4~8（根据 CPU 核心数和并发负载调整）；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：CPU、IO（并行读取能力）；"
+}

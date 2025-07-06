@@ -1,0 +1,43 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.6",
+  "bottlenecks": [
+    "大量写操作导致锁竞争"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "物理机"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "75%",
+      "memory_utilization": "70%",
+      "disk_iops": "15k",
+      "disk_latency": "2ms",
+      "network_throughput": "800MB/s"
+    },
+    "mysql": {
+      "qps": "5000",
+      "tps": "1200",
+      "lock_contention_rate": "25%",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "slow_queries": "50 per second",
+      "threads_running": "45"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "2G",
+    "innodb_flush_log_at_trx_commit": "2",
+    "innodb_thread_concurrency": "16",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "innodb_flush_method": "O_DIRECT",
+    "sync_binlog": "0"
+  },
+  "param_knowledge": "innodb_thread_concurrency  \n- 控制 InnoDB 引擎内部并发执行的线程数量，用于减少线程竞争；  \n- 推荐设置为 CPU核心数 * 2 或 32~64 之间的经验值；  \n- 是否动态生效：是；  \n- 影响维度：CPU、锁竞争；  \n\ninnodb_flush_log_at_trx_commit  \n- 控制事务提交时日志刷盘的策略，平衡持久性与性能；  \n- 推荐设置为 2（非严格持久化场景）或 1（严格ACID场景）；  \n- 是否动态生效：是；  \n- 影响维度：IO、写吞吐量；  \n\ninnodb_autoinc_lock_mode  \n- 控制自增列锁定的模式，减少插入操作时的表级锁竞争；  \n- 推荐设置为 2（交错模式，高并发插入场景）；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：锁竞争、写并发；  \n\ninnodb_buffer_pool_size  \n- 定义 InnoDB 缓冲池的内存大小，缓存表及索引数据；  \n- 推荐设置为可用物理内存的 50%~70%；  \n- 是否动态生效：是（部分版本需重启）；  \n- 影响维度：内存、磁盘IO；  \n\ninnodb_deadlock_detect  \n- 控制是否启用死锁检测机制，高并发写时关闭可降低开销；  \n- 推荐设置为 OFF（明确无死锁场景）或 ON（默认）；  \n- 是否动态生效：是；  \n- 影响维度：CPU、锁竞争延迟；"
+}

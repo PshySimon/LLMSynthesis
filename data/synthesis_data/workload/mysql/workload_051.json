@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.7",
+  "bottlenecks": [
+    "未优化的JOIN操作导致性能下降"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_usage": "45%",
+      "memory_usage": "8GB",
+      "disk_iops": "12000",
+      "network_throughput": "800Mbps",
+      "disk_latency": "0.8ms"
+    },
+    "mysql": {
+      "query_execution_time": "350ms",
+      "slow_queries": "15 queries/min",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "threads_running": "12",
+      "join_operations_per_second": "45",
+      "lock_wait_time": "200ms"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "1G",
+    "innodb_flush_method": "O_DIRECT",
+    "innodb_thread_concurrency": "8",
+    "join_buffer_size": "256M",
+    "max_connections": "200",
+    "query_cache_type": "0",
+    "tmp_table_size": "256M",
+    "max_heap_table_size": "256M"
+  },
+  "param_knowledge": "join_buffer_size  \n- 控制JOIN操作时用于关联表记录的缓冲区大小；  \n- 推荐设置为4M-16M（根据可用内存调整，通常不超过总内存的1%）；  \n- 是否动态生效：是；  \n- 影响维度：内存（过小导致多次磁盘IO，过大会占用过多内存）；  \n\noptimizer_switch  \n- 控制查询优化器的行为开关（如是否使用索引合并、子查询物化等JOIN优化策略）；  \n- 推荐根据版本启用`batched_key_access=on`和`block_nested_loop=off`；  \n- 是否动态生效：是；  \n- 影响维度：CPU和IO（优化器决策直接影响执行计划效率）；  \n\nmax_join_size  \n- 限制单个JOIN查询可处理的最大行数，防止低效JOIN耗尽资源；  \n- 推荐设置为10M-100M（需平衡业务需求和系统容量）；  \n- 是否动态生效：是；  \n- 影响维度：内存和CPU（过大可能导致OOM，过小会中断合法查询）；  \n\neq_range_index_dive_limit  \n- 控制优化器对索引范围扫描的评估方式（通过统计采样或全量计算）；  \n- 推荐设置为100-200（表数据分布不均时可增大）；  \n- 是否动态生效：是；  \n- 影响维度：CPU（减少索引潜水计算开销，但可能影响JOIN计划准确性）；  \n\nread_rnd_buffer_size  \n- 控制排序后读取行的缓冲区大小，影响JOIN后的排序性能；  \n- 推荐设置为256K-2M（大型JOIN查询可适当增加）；  \n- 是否动态生效：是；  \n- 影响维度：内存和IO（减少随机IO但增加内存占用）；"
+}

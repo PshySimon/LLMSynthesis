@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.6",
+  "bottlenecks": [
+    "未合理分区导致单表数据过大"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_usage": "45%",
+      "memory_usage": "8GB",
+      "disk_iops": "12000",
+      "network_throughput": "500Mbps",
+      "disk_latency": "2ms"
+    },
+    "mysql": {
+      "query_per_second": "1500",
+      "slow_queries": "15",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "table_scans": "200",
+      "lock_time_ratio": "5%",
+      "active_connections": "50"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "1G",
+    "innodb_file_per_table": "ON",
+    "innodb_flush_log_at_trx_commit": "2",
+    "innodb_flush_method": "O_DIRECT",
+    "max_connections": "200",
+    "table_open_cache": "4000",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000"
+  },
+  "param_knowledge": "innodb_buffer_pool_size  \n- 控制 InnoDB 存储引擎用于缓存数据和索引的内存池大小；  \n- 推荐设置为物理内存的 50%~70%（需预留空间给操作系统及其他进程）；  \n- 是否动态生效：否（需重启生效）；  \n- 影响维度：内存、IO（减少磁盘读写）；  \n\ninnodb_file_per_table  \n- 控制 InnoDB 是否为每个表创建独立的表空间文件；  \n- 推荐设置为 ON（便于单表管理和空间回收）；  \n- 是否动态生效：是（但仅对新表生效）；  \n- 影响维度：存储效率、维护灵活性（避免大表共享表空间导致的性能问题）；  \n\ninnodb_flush_log_at_trx_commit  \n- 控制事务提交时日志写入磁盘的频率和持久性；  \n- 推荐设置为 1（完全持久化，但性能较低）或 2（折衷方案，仅主线程每秒刷盘）；  \n- 是否动态生效：是；  \n- 影响维度：IO、事务延迟（高频率刷盘增加安全性但降低吞吐）；  \n\nmax_connections  \n- 控制 MySQL 允许的最大并发连接数；  \n- 推荐根据应用负载动态调整（公式：活跃连接峰值 × 1.5）；  \n- 是否动态生效：是；  \n- 影响维度：内存、CPU（过多连接消耗资源并导致竞争）；  \n\ninnodb_io_capacity  \n- 控制 InnoDB 后台任务的 IO 吞吐能力（如刷脏页速率）；  \n- 推荐设置为存储设备 IOPS 的 50%~75%（如 SSD 可设 2000+）；  \n- 是否动态生效：是；  \n- 影响维度：IO、吞吐量（合理设置可避免突发负载时的性能波动）；"
+}

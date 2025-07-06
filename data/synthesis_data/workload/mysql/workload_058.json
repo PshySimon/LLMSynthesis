@@ -1,0 +1,45 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.7",
+  "bottlenecks": [
+    "大量写操作导致锁竞争"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "75%",
+      "memory_utilization": "70%",
+      "disk_iops": "15000",
+      "disk_latency": "2ms",
+      "network_throughput": "800Mbps"
+    },
+    "mysql": {
+      "qps": "1200",
+      "tps": "500",
+      "innodb_row_lock_waits": "200/sec",
+      "innodb_row_lock_time_avg": "500ms",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "threads_running": "25",
+      "slow_queries": "10/min"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "2G",
+    "innodb_flush_log_at_trx_commit": "2",
+    "innodb_thread_concurrency": "16",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "innodb_flush_method": "O_DIRECT",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000"
+  },
+  "param_knowledge": "innodb_thread_concurrency  \n- 控制 InnoDB 内核中允许并发执行的线程数量，用于减少大量写操作时的线程竞争；  \n- 推荐设置为 CPU核心数 × 2 到 CPU核心数 × 4 之间；  \n- 是否动态生效：是；  \n- 影响维度：CPU（线程调度）、锁竞争（并发控制）；  \n\ninnodb_flush_log_at_trx_commit  \n- 控制事务提交时日志刷盘的严格程度，权衡数据安全性与写性能；  \n- 推荐写密集型场景设为 2（非严格持久化），关键业务保持默认 1（完全持久化）；  \n- 是否动态生效：是；  \n- 影响维度：IO（日志写入吞吐）、事务延迟；  \n\ninnodb_autoinc_lock_mode  \n- 控制自增列锁机制，影响批量插入的并发性；  \n- 推荐高并发插入场景设为 2（交错模式），传统业务可设为 1（连续模式）；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：锁竞争（自增锁粒度）、插入吞吐量；  \n\ninnodb_buffer_pool_instances  \n- 将缓冲池分区以减少内存争用，提升高并发下的缓冲池访问效率；  \n- 推荐值为 4-8（每实例不小于1GB）；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：内存（分区管理）、锁竞争（缓冲池访问）；  \n\nsync_binlog  \n- 控制二进制日志刷盘频率，影响主从同步安全性与写性能；  \n- 推荐从库设为 1（安全），主库可设为 0 或 100-1000（性能优先）；  \n- 是否动态生效：是；  \n- 影响维度：IO（日志写入）、复制延迟；"
+}

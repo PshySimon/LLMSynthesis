@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.6",
+  "bottlenecks": [
+    "大事务导致锁持有时间过长"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "70%",
+      "disk_iops": "8500",
+      "disk_latency": "2.5ms",
+      "network_throughput": "600MB/s"
+    },
+    "mysql": {
+      "qps": "1200",
+      "tps": "150",
+      "active_transactions": "45",
+      "lock_wait_time": "3.2s",
+      "innodb_buffer_pool_hit_rate": "92%",
+      "slow_queries": "15 per minute",
+      "threads_running": "28"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "1G",
+    "innodb_flush_log_at_trx_commit": "2",
+    "innodb_lock_wait_timeout": "30",
+    "max_connections": "200",
+    "transaction_isolation": "READ-COMMITTED",
+    "binlog_format": "ROW",
+    "innodb_io_capacity": "2000"
+  },
+  "param_knowledge": "innodb_lock_wait_timeout  \n- 控制 InnoDB 事务等待行锁的最长时间（秒），超时后自动回滚；  \n- 推荐设置为 30-120（根据业务容忍度调整），OLTP系统建议≤60；  \n- 是否动态生效：是；  \n- 影响维度：锁竞争、事务吞吐量、连接池资源；  \n\ninnodb_rollback_on_timeout  \n- 控制锁等待超时后是否回滚整个事务（而非仅最后一条语句）；  \n- 推荐设置为 ON（大事务场景建议启用）；  \n- 是否动态生效：否；  \n- 影响维度：事务原子性、锁释放速度、系统资源占用；  \n\nmax_allowed_packet  \n- 控制单个SQL或事务允许的最大数据包大小（字节）；  \n- 推荐设置为 64M-256M（需匹配业务事务规模）；  \n- 是否动态生效：是；  \n- 影响维度：网络传输、内存消耗、大事务执行成功率；  \n\ninnodb_deadlock_detect  \n- 控制是否启用InnoDB死锁检测机制；  \n- 高频锁竞争场景可设为 OFF（需配合应用层重试逻辑）；  \n- 是否动态生效：是；  \n- 影响维度：CPU开销、锁等待延迟、系统稳定性；  \n\ntransaction_isolation  \n- 控制事务隔离级别（如READ-COMMITTED可减少锁持有范围）；  \n- 推荐根据业务需求选择，高并发场景建议READ-COMMITTED；  \n- 是否动态生效：是（部分级别需重启）；  \n- 影响维度：锁粒度、并发性能、数据一致性；"
+}

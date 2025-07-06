@@ -1,0 +1,8 @@
+{
+  "os_version": "openEuler 24.03 LTS",
+  "cpu_info": "16 核 @ 2.6GHz",
+  "memory_info": "64GB DDR4",
+  "storage_type": "NVMe SSD",
+  "network_info": "1Gbps 以太网",
+  "runtime_environment": "虚拟机（KVM）"
+}

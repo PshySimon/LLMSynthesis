@@ -1,0 +1,43 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.6",
+  "bottlenecks": [
+    "高并发连接数导致线程争用"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_usage": "75%",
+      "memory_usage": "12GB/16GB",
+      "disk_iops": "15000",
+      "network_throughput": "8Gbps",
+      "context_switches_per_sec": "5000"
+    },
+    "mysql": {
+      "connections": "500/800",
+      "threads_running": "50",
+      "innodb_row_lock_waits": "120/sec",
+      "query_cache_hit_rate": "65%",
+      "slow_queries": "15/sec",
+      "buffer_pool_hit_rate": "85%"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "max_connections": "500",
+    "innodb_thread_concurrency": "16",
+    "thread_cache_size": "32",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "table_open_cache": "4000",
+    "innodb_flush_method": "O_DIRECT"
+  },
+  "param_knowledge": "innodb_thread_concurrency  \n- 控制 InnoDB 存储引擎并发执行的线程数量，用于减少线程争用；  \n- 推荐设置为 CPU 核心数的 2 倍（经验值），或 0 表示无限制；  \n- 是否动态生效：是；  \n- 影响维度：CPU、线程调度效率；  \n\nthread_cache_size  \n- 控制线程缓存池中保留的线程数量，用于复用连接线程以减少创建/销毁开销；  \n- 推荐设置为并发连接数的 5-10%（如 100 连接时设为 5-10）；  \n- 是否动态生效：是；  \n- 影响维度：内存、线程创建开销；  \n\ntable_open_cache  \n- 控制表描述符缓存大小，减少频繁开表带来的资源竞争；  \n- 推荐设置为 max_connections * 表关联数（通常 2000-4000）；  \n- 是否动态生效：是；  \n- 影响维度：内存、文件描述符数量；  \n\nback_log  \n- 控制等待连接的请求队列长度，在高并发时缓解连接堆积；  \n- 推荐设置为 max_connections 的 50-70%；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：网络、连接稳定性；  \n\ninnodb_read_io_threads  \n- 控制 InnoDB 后台读操作的 I/O 线程数，优化磁盘读取并发；  \n- 推荐设置为 4-8（根据存储 I/O 能力调整）；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：磁盘 I/O、读吞吐量；"
+}

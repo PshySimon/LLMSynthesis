@@ -1,0 +1,45 @@
+{
+  "app_name": "mysql",
+  "app_version": "8.0",
+  "bottlenecks": [
+    "内存不足导致频繁磁盘I/O"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "物理机"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "75%",
+      "memory_utilization": "95%",
+      "swap_usage": "5GB",
+      "disk_iops": "15000",
+      "disk_latency": "5ms",
+      "network_throughput": "2Gbps"
+    },
+    "mysql": {
+      "query_throughput": "1200 queries/sec",
+      "slow_queries": "15 queries/sec",
+      "innodb_buffer_pool_hit_ratio": "85%",
+      "innodb_buffer_pool_wait_free": "10/sec",
+      "innodb_row_lock_waits": "20/sec",
+      "threads_running": "25"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "2G",
+    "innodb_flush_method": "O_DIRECT",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "innodb_flush_neighbors": "0",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "max_connections": "200"
+  },
+  "param_knowledge": "innodb_buffer_pool_size  \n- 控制 InnoDB 存储引擎用于缓存数据和索引的内存池大小；  \n- 推荐设置为物理内存的 50%~70%（需预留内存给操作系统及其他进程）；  \n- 是否动态生效：部分生效（修改后需重启完全生效，动态调整仅影响新增内存分配）；  \n- 影响维度：内存使用率、磁盘I/O频率（减少物理读）；  \n\ninnodb_io_capacity  \n- 控制 InnoDB 后台任务的 I/O 吞吐能力上限（如刷新脏页、合并插入缓冲等）；  \n- 推荐值：SSD 设置为 2000~4000，传统硬盘设置为 200~800（需根据实际磁盘性能调整）；  \n- 是否动态生效：是；  \n- 影响维度：磁盘I/O吞吐量、写操作延迟；  \n\ninnodb_flush_neighbors  \n- 控制 InnoDB 是否合并刷新相邻脏页（减少随机I/O）；  \n- 推荐值：HDD 设置为 1（启用），SSD 设置为 0（禁用）；  \n- 是否动态生效：是；  \n- 影响维度：磁盘I/O模式（顺序/随机）、写性能；  \n\ninnodb_max_dirty_pages_pct  \n- 控制 InnoDB 缓冲池中脏页占比的阈值，超过该值会触发强制刷新；  \n- 推荐值：75%~90%（低负载可调高，高负载需调低以避免I/O尖峰）；  \n- 是否动态生效：是；  \n- 影响维度：内存占用、磁盘I/O突发性；  \n\ninnodb_adaptive_hash_index  \n- 控制 InnoDB 是否启用自适应哈希索引（加速等值查询）；  \n- 推荐值：高并发点查场景启用（1），写密集型或内存紧张时禁用（0）；  \n- 是否动态生效：是；  \n- 影响维度：CPU消耗、内存占用、查询响应时间；"
+}

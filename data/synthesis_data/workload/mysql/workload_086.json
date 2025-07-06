@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.6",
+  "bottlenecks": [
+    "未使用连接池导致连接创建开销大"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "45%",
+      "memory_utilization": "60%",
+      "disk_iops": "8500",
+      "disk_latency": "0.8ms",
+      "network_throughput": "500Mbps"
+    },
+    "mysql": {
+      "query_per_second": "1200",
+      "connections_created_per_second": "150",
+      "average_query_latency": "12ms",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "threads_running": "25",
+      "slow_queries_per_second": "5"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "max_connections": "200",
+    "thread_cache_size": "16",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "innodb_flush_neighbors": "0",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "skip_name_resolve": "ON"
+  },
+  "param_knowledge": "max_connections  \n- 控制 MySQL 服务器允许的最大并发连接数；  \n- 推荐设置为可用内存的 1/4（单位 MB）除以单个连接平均内存消耗（经验值 0.5-4MB），需预留系统开销；  \n- 是否动态生效：是；  \n- 影响维度：内存（连接缓冲区）、CPU（上下文切换）、网络（连接竞争）；  \n\nwait_timeout  \n- 控制非交互式连接在空闲状态下的自动断开时间（秒）；  \n- 推荐设置为应用连接池回收间隔的 1.2-1.5 倍，典型值 60-300；  \n- 是否动态生效：是；  \n- 影响维度：内存（连接占用）、CPU（连接清理开销）；  \n\nthread_cache_size  \n- 控制线程缓存池中保留的线程数量，减少频繁创建/销毁线程的开销；  \n- 推荐值为 max_connections 的 10%-25%，或公式：峰值并发连接数 × 0.1；  \n- 是否动态生效：是；  \n- 影响维度：CPU（线程创建开销）、内存（缓存线程栈）；  \n\ninnodb_buffer_pool_size  \n- 控制 InnoDB 引擎缓存数据和索引的内存池大小；  \n- 推荐设置为可用物理内存的 50%-70%（专用数据库场景）；  \n- 是否动态生效：是（需版本支持）；  \n- 影响维度：内存（缓存命中率）、IO（磁盘读写减少）；  \n\nback_log  \n- 控制连接请求队列长度，应对瞬时高并发连接；  \n- 推荐值为 max_connections 的 50% 或操作系统限制的较小值；  \n- 是否动态生效：否；  \n- 影响维度：网络（连接排队）、CPU（连接调度）；"
+}

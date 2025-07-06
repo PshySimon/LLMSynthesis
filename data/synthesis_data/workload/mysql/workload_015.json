@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "8.0",
+  "bottlenecks": [
+    "子查询或临时表使用不当"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "物理机"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "70%",
+      "disk_iops": "8500",
+      "network_throughput": "600MB/s",
+      "disk_latency": "0.8ms"
+    },
+    "mysql": {
+      "query_execution_time": "120ms",
+      "slow_queries": "15 queries/min",
+      "temp_tables_created": "200 tables/min",
+      "subquery_execution_count": "500 executions/min",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "threads_running": "25"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "tmp_table_size": "256M",
+    "max_heap_table_size": "256M",
+    "innodb_flush_neighbors": "0",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "query_cache_type": "0"
+  },
+  "param_knowledge": "# MySQL 调优参数建议（子查询/临时表场景）\n\n## tmp_table_size\n- 控制内存中临时表的最大容量，超过此值将转为磁盘临时表；\n- 推荐设置为内存的 20%-30%（如 32M-64M 起步），需结合系统内存调整；\n- 是否动态生效：是；\n- 影响维度：内存使用、磁盘 I/O；\n\n## max_heap_table_size\n- 定义 MEMORY 存储引擎表的最大尺寸，影响内存临时表的上限；\n- 建议与 tmp_table_size 保持相同值；\n- 是否动态生效：是；\n- 影响维度：内存使用、查询执行效率；\n\n## optimizer_switch\n- 控制查询优化器的行为开关，包含 derived_merge 等子查询优化选项；\n- 推荐开启 derived_merge=on,materialization=on 等优化标志；\n- 是否动态生效：是；\n- 影响维度：CPU 计算、查询执行计划质量；\n\n## join_buffer_size\n- 为没有索引的联接操作分配缓冲区大小，影响复杂子查询处理；\n- 建议 4M-16M，过大会消耗过多内存；\n- 是否动态生效：是；\n- 影响维度：内存使用、多表连接性能；\n\n## sort_buffer_size\n- 定义排序操作使用的缓冲区大小，影响含排序的子查询；\n- 推荐 2M-8M，需避免全局设置过大；\n- 是否动态生效：是（但仅对新连接生效）；\n- 影响维度：内存使用、排序操作效率；"
+}

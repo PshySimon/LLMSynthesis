@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.6",
+  "bottlenecks": [
+    "网络延迟影响复制性能"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "45%",
+      "memory_utilization": "65%",
+      "disk_iops": "8500",
+      "network_latency": "3.2ms",
+      "disk_latency": "1.5ms"
+    },
+    "mysql": {
+      "qps": "1200",
+      "tps": "350",
+      "replication_lag": "5.2s",
+      "innodb_buffer_pool_hit_ratio": "92%",
+      "threads_running": "12",
+      "slow_queries": "8"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_io_capacity": "2000",
+    "innodb_flush_neighbors": "0",
+    "sync_binlog": "1",
+    "innodb_flush_log_at_trx_commit": "1",
+    "slave_parallel_workers": "4",
+    "slave_net_timeout": "60",
+    "max_connections": "200",
+    "skip_name_resolve": "ON"
+  },
+  "param_knowledge": "slave_net_timeout  \n- 控制从库在认定主库连接超时前的等待时间（秒）；  \n- 推荐设置为 5-10（低于默认值3600以应对高延迟网络）；  \n- 是否动态生效：是；  \n- 影响维度：网络、复制延迟；  \n\nslave_compressed_protocol  \n- 控制是否启用主从复制通信的压缩传输；  \n- 推荐设置为 ON（高延迟或低带宽网络下显著减少传输量）；  \n- 是否动态生效：是；  \n- 影响维度：网络带宽、CPU（压缩开销）；  \n\nslave_parallel_workers  \n- 控制从库并行应用 relay log 的线程数；  \n- 推荐设置为 4-8（需结合从库CPU核心数调整）；  \n- 是否动态生效：是；  \n- 影响维度：CPU、复制吞吐量；  \n\nbinlog_group_commit_sync_delay  \n- 控制二进制日志提交前等待组提交的微秒数；  \n- 推荐设置为 100-500（平衡延迟与吞吐量）；  \n- 是否动态生效：是；  \n- 影响维度：IO、网络（减少频繁小包传输）；  \n\nslave_pending_jobs_size_max  \n- 控制并行复制线程队列的最大内存占用（字节）；  \n- 推荐设置为 128M-1G（大事务场景需调高）；  \n- 是否动态生效：是；  \n- 影响维度：内存、复制并行度；"
+}

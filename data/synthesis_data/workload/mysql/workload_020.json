@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "8.0",
+  "bottlenecks": [
+    "索引缺失或不当导致查询性能低下"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "物理机"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "70%",
+      "disk_iops": "8500",
+      "disk_latency": "2.5ms",
+      "network_throughput": "600MB/s"
+    },
+    "mysql": {
+      "qps": "1200",
+      "tps": "350",
+      "slow_query_rate": "8%",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "lock_wait_time": "1.2s",
+      "index_usage_efficiency": "60%"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "innodb_flush_neighbors": "0",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "innodb_adaptive_hash_index": "OFF",
+    "query_cache_size": "0",
+    "max_connections": "200"
+  },
+  "param_knowledge": "innodb_buffer_pool_size  \n- 控制 InnoDB 存储引擎缓存数据和索引的内存池大小；  \n- 推荐设置为物理内存的 50%~70%；  \n- 是否动态生效：否（需重启生效）；  \n- 影响维度：内存、IO（减少磁盘读取）；  \n\ninnodb_adaptive_hash_index  \n- 控制 InnoDB 是否启用自适应哈希索引以加速等值查询；  \n- 推荐在高并发点查场景设为 ON，范围查询为主时设为 OFF；  \n- 是否动态生效：是；  \n- 影响维度：CPU（哈希计算）、内存（索引缓存）；  \n\noptimizer_switch  \n- 控制查询优化器的行为开关组（如索引合并、范围优化等）；  \n- 推荐根据业务查询模式调整，例如关闭 index_merge_union 可避免低效索引合并；  \n- 是否动态生效：是；  \n- 影响维度：CPU（查询计划生成）、IO（执行效率）；  \n\nmax_heap_table_size  \n- 控制内存临时表的最大容量，影响隐式临时表和显式 MEMORY 表；  \n- 推荐与 tmp_table_size 同设为 64M~1G，避免磁盘临时表；  \n- 是否动态生效：是；  \n- 影响维度：内存、IO（临时表溢出时写磁盘）；  \n\ninnodb_stats_persistent  \n- 控制 InnoDB 是否持久化统计信息，影响优化器索引选择准确性；  \n- 推荐在表数据频繁变化时设为 ON 并配合 innodb_stats_auto_recalc；  \n- 是否动态生效：是；  \n- 影响维度：CPU（统计计算）、IO（统计信息持久化）；"
+}

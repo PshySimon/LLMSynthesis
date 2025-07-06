@@ -1,0 +1,43 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.7",
+  "bottlenecks": [
+    "磁盘I/O性能成为瓶颈"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "70%",
+      "disk_iops": "8500",
+      "disk_latency": "5ms",
+      "network_throughput": "600MB/s"
+    },
+    "mysql": {
+      "query_per_second": "1200",
+      "slow_queries": "15",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "innodb_row_lock_time": "200ms",
+      "innodb_io_reads": "4500/s",
+      "innodb_io_writes": "3000/s"
+    }
+  },
+  "config": {
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "innodb_flush_neighbors": "0",
+    "innodb_flush_method": "O_DIRECT",
+    "innodb_log_file_size": "2G",
+    "innodb_buffer_pool_size": "12G",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8"
+  },
+  "param_knowledge": "innodb_io_capacity  \n- 控制 InnoDB 后台任务的 I/O 吞吐量上限（如刷新脏页、合并插入缓冲等）；  \n- 推荐设置为磁盘 IOPS 的 50%-75%（如 SSD 可设 2000-4000，机械盘 200-400）；  \n- 是否动态生效：是；  \n- 影响维度：磁盘 I/O、吞吐量、写密集型负载延迟；  \n\ninnodb_flush_neighbors  \n- 控制 InnoDB 刷新脏页时是否合并相邻页的 I/O 操作；  \n- 推荐 SSD 设置为 0（关闭），机械盘设置为 1（开启）以减少随机 I/O；  \n- 是否动态生效：是；  \n- 影响维度：磁盘 I/O 效率、写放大、随机/顺序 I/O 比例；  \n\ninnodb_read_io_threads  \n- 控制 InnoDB 处理读请求的后台线程数；  \n- 推荐值：4-8（根据 CPU 核心数和并发读负载调整）；  \n- 是否动态生效：否（需重启）；  \n- 影响维度：磁盘读并行度、CPU 上下文切换、高并发查询响应时间；  \n\ninnodb_buffer_pool_size  \n- 控制 InnoDB 缓冲池的内存分配量，用于缓存表/索引数据；  \n- 推荐设置为可用物理内存的 50%-70%（需预留 OS 及其他进程内存）；  \n- 是否动态生效：是（但大调整可能触发阻塞性操作）；  \n- 影响维度：内存使用、磁盘 I/O 频率、缓存命中率；  \n\ninnodb_adaptive_flushing  \n- 控制 InnoDB 是否根据工作负载动态调整脏页刷新速率；  \n- 推荐值：ON（默认），适用于 I/O 波动较大的场景；  \n- 是否动态生效：是；  \n- 影响维度：I/O 突发处理能力、写负载平滑度、长事务稳定性；"
+}

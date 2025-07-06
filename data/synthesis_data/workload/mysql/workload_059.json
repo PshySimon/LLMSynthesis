@@ -1,0 +1,45 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.7",
+  "bottlenecks": [
+    "网络延迟影响复制性能"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "70%",
+      "disk_iops": "4500",
+      "disk_latency": "2ms",
+      "network_throughput": "8Gbps",
+      "network_latency": "5ms"
+    },
+    "mysql": {
+      "query_per_second": "1200",
+      "slow_queries": "15",
+      "replication_lag": "500ms",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "threads_running": "25",
+      "lock_timeouts": "5"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "sync_binlog": "1",
+    "innodb_flush_log_at_trx_commit": "1",
+    "slave_parallel_workers": "4",
+    "slave_net_timeout": "60",
+    "max_connections": "200",
+    "thread_cache_size": "16"
+  },
+  "param_knowledge": "slave_net_timeout  \n- 控制从库在断开连接前等待主库发送数据的超时时间（秒）；  \n- 推荐设置为 5-60，高延迟网络可适当增大；  \n- 是否动态生效：是；  \n- 影响维度：网络、复制延迟；  \n\nslave_compressed_protocol  \n- 控制主从复制是否启用压缩传输；  \n- 推荐在带宽受限时设置为 ON；  \n- 是否动态生效：是；  \n- 影响维度：网络带宽、CPU（压缩开销）；  \n\nslave_parallel_workers  \n- 控制从库并行应用 relay log 的线程数；  \n- 推荐设置为 4-8（公式：CPU核心数/2）；  \n- 是否动态生效：否；  \n- 影响维度：CPU、复制吞吐量；  \n\nsync_binlog  \n- 控制二进制日志刷盘频率（0=系统控制，1=每次提交刷盘）；  \n- 推荐主库设置为 1，从库可设为 0；  \n- 是否动态生效：是；  \n- 影响维度：IO、数据安全性；  \n\nslave_pending_jobs_size_max  \n- 控制并行复制时内存队列的最大容量（字节）；  \n- 推荐设置为 128M-1G（需小于 slave_max_allowed_packet）；  \n- 是否动态生效：是；  \n- 影响维度：内存、并行复制效率；"
+}

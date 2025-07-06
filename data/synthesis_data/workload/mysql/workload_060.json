@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "8.0",
+  "bottlenecks": [
+    "子查询或临时表使用不当"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "Docker 容器"
+  },
+  "workload": {
+    "system": {
+      "cpu_usage": "45%",
+      "memory_usage": "10GB",
+      "disk_iops": "8500",
+      "network_throughput": "1.2Gbps",
+      "disk_latency": "0.8ms"
+    },
+    "mysql": {
+      "queries_per_second": "1200",
+      "slow_queries": "15",
+      "temporary_tables_created": "200/s",
+      "subquery_execution_time": "150ms",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "threads_running": "12"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000",
+    "tmp_table_size": "256M",
+    "max_heap_table_size": "256M",
+    "innodb_flush_neighbors": "0",
+    "innodb_read_io_threads": "8",
+    "innodb_write_io_threads": "8",
+    "query_cache_type": "OFF"
+  },
+  "param_knowledge": "tmp_table_size  \n- 控制内存中临时表的最大容量，超过该值将转为磁盘存储；  \n- 推荐设置为物理内存的5%-20%（如1GB-4GB），需与max_heap_table_size保持一致；  \n- 是否动态生效：是；  \n- 影响维度：内存（减少磁盘IO）、IO（溢出时增加写盘开销）；  \n\nmax_heap_table_size  \n- 定义用户创建的MEMORY引擎表及隐式内存临时表的最大尺寸；  \n- 建议与tmp_table_size相同，通常设置为64MB-4GB；  \n- 是否动态生效：是；  \n- 影响维度：内存（限制内存表膨胀）、IO（溢出时转磁盘）；  \n\noptimizer_switch  \n- 通过子选项控制查询优化器行为，如subquery_to_derived可将子查询转为派生表优化；  \n- 推荐启用\"subquery_to_derived=on,materialization=on\"等子查询相关优化；  \n- 是否动态生效：是；  \n- 影响维度：CPU（优化计划生成开销）、IO（减少临时表生成）；  \n\njoin_buffer_size  \n- 为没有索引的关联操作分配缓冲大小，可能影响包含子查询的派生表连接；  \n- 建议256KB-8MB，过高会导致内存碎片；  \n- 是否动态生效：是；  \n- 影响维度：内存（每个连接独占分配）、CPU（减少嵌套循环次数）；  \n\ninnodb_temp_data_file_path  \n- 定义InnoDB临时表空间文件路径和扩展策略，影响磁盘临时表性能；  \n- 推荐设置为\"ibtmp1:12M:autoextend:max:5G\"控制增长上限；  \n- 是否动态生效：否；  \n- 影响维度：IO（磁盘临时表读写效率）、存储空间（避免无限膨胀）；"
+}

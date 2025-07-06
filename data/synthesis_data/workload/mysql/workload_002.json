@@ -1,0 +1,44 @@
+{
+  "app_name": "mysql",
+  "app_version": "5.7",
+  "bottlenecks": [
+    "未优化的查询导致全表扫描"
+  ],
+  "system": {
+    "os_version": "openEuler 24.03 LTS",
+    "cpu_info": "8 核 @ 2.4GHz",
+    "memory_info": "16GB DDR4",
+    "storage_type": "NVMe SSD",
+    "network_info": "万兆以太网",
+    "runtime_environment": "物理机"
+  },
+  "workload": {
+    "system": {
+      "cpu_utilization": "65%",
+      "memory_utilization": "70%",
+      "disk_iops": "8500",
+      "disk_latency": "2.5ms",
+      "network_throughput": "600MB/s"
+    },
+    "mysql": {
+      "qps": "1200",
+      "tps": "350",
+      "slow_queries": "45 per second",
+      "table_scans": "30% of queries",
+      "innodb_buffer_pool_hit_rate": "85%",
+      "lock_wait_time": "500ms"
+    }
+  },
+  "config": {
+    "innodb_buffer_pool_size": "8G",
+    "innodb_log_file_size": "1G",
+    "innodb_flush_log_at_trx_commit": "2",
+    "query_cache_size": "0",
+    "max_connections": "200",
+    "tmp_table_size": "64M",
+    "max_heap_table_size": "64M",
+    "innodb_io_capacity": "2000",
+    "innodb_io_capacity_max": "4000"
+  },
+  "param_knowledge": "innodb_buffer_pool_size  \n- 控制 InnoDB 存储引擎用于缓存数据和索引的内存池大小；  \n- 推荐设置为物理内存的 50%~70%（需预留空间给系统和其他进程）；  \n- 是否动态生效：否（需重启生效）；  \n- 影响维度：内存、IO（减少磁盘读取）；  \n\nmax_heap_table_size  \n- 控制内存临时表的最大容量，超过该值将转为磁盘临时表；  \n- 推荐设置为 32M~1G（需结合业务临时表大小调整）；  \n- 是否动态生效：是；  \n- 影响维度：内存、IO（避免临时表磁盘化）；  \n\noptimizer_search_depth  \n- 控制查询优化器执行计划的搜索深度，影响全表扫描决策；  \n- 推荐设置为 5~10（0表示自动优化，过高值增加优化耗时）；  \n- 是否动态生效：是；  \n- 影响维度：CPU（优化器计算开销）、查询效率；  \n\njoin_buffer_size  \n- 控制用于表关联操作（非索引关联）的内存缓冲区大小；  \n- 推荐设置为 1M~8M（过大会占用过多内存）；  \n- 是否动态生效：是；  \n- 影响维度：内存、CPU（减少嵌套循环关联成本）；  \n\nread_rnd_buffer_size  \n- 控制排序操作时读取行的缓冲区大小，影响全表扫描排序性能；  \n- 推荐设置为 256K~1M（过大可能浪费内存）；  \n- 是否动态生效：是；  \n- 影响维度：内存、IO（减少随机磁盘访问）；"
+}
